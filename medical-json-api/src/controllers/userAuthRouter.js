@@ -1,7 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const router = express.Router();
-const User = require('../models/user');
+const User = require('../models/common/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -77,7 +77,7 @@ router.post('/login', async (req, res) => {
 
                 //sign a new JWT token
                 const payload = {
-                    id: foundUser._id,
+                    userId: foundUser._id,
                     user: foundUser.email
                 };
 
@@ -103,7 +103,22 @@ router.post('/login', async (req, res) => {
     }
 });
 
-//   // Logout - to be worked on
+// Authenticated Routes
+router.use((req, res, next) => {
+    const token = req.get('token');
+    jwt.verify(token, secretKey, { algorithms: ["HS256"] }, (err, decode) => {
+        if (!err) {
+            req.user = decode; //store user info on request object
+            console.log(decode)
+            next(); //middleware complete, move to next endpoint
+        }
+        else {
+            res.status(401).send('Please login');
+        }
+    })
+})
+
+//   // Logout - handle jwt token - to be worked on
 //   router.get('/logout', async(req, res) => {
 
 //     req.session.destroy((err) => {

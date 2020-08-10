@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const Cart = require('../models/shoppingCart/cart');
 const Product = require('../models/shoppingCart/product');
 const { listIndexes } = require('../models/shoppingCart/cart');
+const e = require('express');
 
 const secretKey = '87CB9E5B-7C0B-4717-8D14-CCC3C41B6BBB'; //GUID
 
@@ -56,20 +57,24 @@ router.post("/new", async (req, res) => {
     } catch {
         res.status(400).send("bad request");
     }
-
 });
 
 // to be review once frontend payload is ready
 router.post('/update', async (req, res) => {
-    
     try {
-        const cart = await Cart.findOne({owner: req.user.userId, _id: req.body.cartId});
+        const cart = await Cart.findOne({owner: req.user.userId});
         // const product = await Product.findOne({_id: req.body.productId})
-        const products = res.body;
+        const products = req.body.products;
+        // console.log(res.body.products);
         if(cart){
-            cart.items.push(products);
+            //loop through each item and push
+            products.forEach(e => {
+                cart.items.push(e);
+            });
+            // cart.items.push(products);
             const result = await cart.save(); //save to database
             res.status(200).json(result);
+            console.log(result)
         } else {
             res.status(400).json("bad request. cart does not exist")
         }

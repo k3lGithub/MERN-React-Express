@@ -7,4 +7,4 @@ const BookingSchema = new mongoose.Schema({
   time: String
 });
 
-module.exports = mongoose.model('Doctor', BookingSchema);
+module.exports = mongoose.model('Booking', BookingSchema);

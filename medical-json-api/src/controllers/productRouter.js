@@ -12,7 +12,6 @@ const findProduct = async (req) => {
 }
 
 // Public Routes
-// Get all Products
 router.get('/', async (req, res, next) => {
     try {
         const allProducts = await Product.find();
@@ -29,7 +28,6 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-// Find Product by ID
 router.get("/:id", async (req, res) => {
     try {
         const data = await Product.findOne({_id: req.params.id});

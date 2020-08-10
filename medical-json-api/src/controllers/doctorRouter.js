@@ -9,6 +9,7 @@ const findDoctor = async (req) => {
     return await Doctor.findOne({ name: req.body.name });
 }
 
+// Public Routes
 router.get('/', async (req, res, next) => {
     try {
         const allDoctors = await Doctor.find();
@@ -25,7 +26,6 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-// Find Doctor by ID
 router.get("/:id", async (req, res) => {
     try {
         const data = await Doctor.findOne({ _id: req.params.id });

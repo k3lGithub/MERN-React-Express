@@ -118,6 +118,8 @@ router.use((req, res, next) => {
     })
 })
 
+// add update password
+
 //   // Logout - handle jwt token - to be worked on
 //   router.get('/logout', async(req, res) => {
 

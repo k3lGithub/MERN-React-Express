@@ -1,20 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import './App.css';
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link,
-  Redirect,
-  useHistory,
-  useLocation,
+  Route
 } from "react-router-dom";
 
 import Button from '@material-ui/core/Button';
-import { LoginPage, fakeAuth } from "./components/LoginSignup";
 
 import Nav from "./components/common/Nav";
-import Header from "./components/common/Header";
 import Home from "./components/page/Home";
 import Products from "./components/page/cart/ProductsPage";
 import Product from "./components/page/cart/ProductPage";
@@ -38,20 +32,19 @@ const isLoggedIn = () => {
 
 function App() {
 
-  const [loggedIn, setLoggedIn] = useState(isLoggedIn);
-
   return (
     <Router>
     <div className="App">
-      <Header/>
+      {/* <Header/> */}
       <Nav/>
       {/* <header className="App-header">
       </header> */}
 
       <Switch>
 
+          {/* replace with modal */}
           <Route path="/login">
-            <LoginSignup setLoginStatus={setLoggedIn} />
+            <p>This is login</p>
           </Route>
 
           <Route path="/search/results">

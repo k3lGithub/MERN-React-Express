@@ -1,4 +1,10 @@
-import React from 'react';
+import React, { useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import {login} from "../api";
+import jwt from "jwt-decode";
+import moment from "moment";
+
+// Styles
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
@@ -16,11 +22,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
-
-
-function rand() {
-  return Math.round(Math.random() * 20) - 10;
-}
 
 function getModalStyle() {
   return {
@@ -82,7 +83,49 @@ function a11yProps(index) {
   };
 }
 
+// ============================ Component ============================ 
+
 export default function LoginSignup(props) {
+
+// Initialization
+let history = useHistory();
+let location = useLocation();
+const [username, setUserEmail] = useState("");
+const [password, setUserPassword] = useState("");
+
+// Fetch API
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  login({
+    email: username,
+    password: password,
+  })
+    .then((token) => {
+      const decoded = jwt(token);
+      console.log(decoded);
+      const expires = moment.unix(decoded.exp);
+      console.log(expires);
+
+      const isBeforeExpiry = moment().isBefore(expires);
+      console.log(isBeforeExpiry);
+
+      //todo
+      /*
+              once logged in, check local storage for token
+              decode token on other pages
+              check if exists & expiry
+          */
+      localStorage.setItem("token", token);
+      props.setLoginStatus(true);
+      history.push("/");
+      //localStorage.getItem('token'); //gets token
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
   const classes = useStyles();
   // getModalStyle is not a pure function, we roll the style only on the first render
   const [modalStyle] = React.useState(getModalStyle);
@@ -118,7 +161,7 @@ export default function LoginSignup(props) {
       <CssBaseline />
         <Typography component="h1" variant="h5">
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleSubmit}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -127,6 +170,8 @@ export default function LoginSignup(props) {
             id="email"
             label="Email Address"
             name="email"
+            onChange={(e) => setUserEmail(e.currentTarget.value)}
+            value={username}
             autoComplete="email"
             autoFocus
           />
@@ -136,6 +181,8 @@ export default function LoginSignup(props) {
             required
             fullWidth
             name="password"
+            onChange={(e) => setUserPassword(e.currentTarget.value)}
+            value={password}
             label="Password"
             type="password"
             id="password"
@@ -250,6 +297,14 @@ export default function LoginSignup(props) {
     </div>
   );
 
+// =============================== Functionality ===============================
+
+
+
+
+
+
+
   return (
     <div>
       {/* <button type="button" onClick={handleOpen}>
@@ -269,4 +324,4 @@ export default function LoginSignup(props) {
       </Modal>
     </div>
   );
-}
+    }

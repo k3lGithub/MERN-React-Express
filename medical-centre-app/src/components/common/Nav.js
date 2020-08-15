@@ -1,19 +1,19 @@
-import React from 'react';
-import logo from '../../medicalLogo.png';
-import { makeStyles } from '@material-ui/core/styles';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import SearchIcon from '@material-ui/icons/Search';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import TextField from '@material-ui/core/TextField';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import LoginSignup from '../LoginSignup';
-
+import React from "react";
+import { useHistory } from "react-router-dom";
+import logo from "../../medicalLogo.png";
+import { makeStyles } from "@material-ui/core/styles";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
+import SearchIcon from "@material-ui/icons/Search";
+import Typography from "@material-ui/core/Typography";
+import Link from "@material-ui/core/Link";
+import TextField from "@material-ui/core/TextField";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import LocationOnIcon from "@material-ui/icons/LocationOn";
+import LoginSignup from "../LoginSignup";
 
 // Material-UI styles
 const useStyles = makeStyles((theme) => ({
@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme) => ({
     flex: 1,
   },
   toolbarSecondary: {
-    justifyContent: 'space-between',
-    overflowX: 'auto',
+    justifyContent: "space-between",
+    overflowX: "auto",
   },
   toolbarLink: {
     padding: theme.spacing(1),
@@ -33,16 +33,30 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-// LOGIN/REGISTER
-
-
-
 // Nav Component
-export default function Nav() {
+export default function Nav(props) {
   const classes = useStyles();
+  const history = useHistory();
 
   // Menu handlers
+  const [anchorElLogout, setAnchorElLogout] = React.useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClickLogout = (event) => {
+    setAnchorElLogout(event.currentTarget);
+  };
+
+  const handleCloseLogout = () => {
+    setAnchorElLogout(null);
+    window.localStorage.clear();
+    console.log(props.isLoggedIn);
+    history.push("/");
+    // Figure how to sync state, props and DOM
+    // this.forceUpdate();
+    // window.location.reload(true);
+    // props.setLoggedIn();
+    // console.log("here")
+  };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -68,7 +82,7 @@ export default function Nav() {
         >
           Medical Centre
         </Typography>
-        
+
         <TextField id="search" label="Search" variant="outlined" />
 
         {/* SEARCH */}
@@ -78,50 +92,118 @@ export default function Nav() {
 
         {/* CHECKOUT */}
         <Link href="/checkout">
-        <IconButton> 
-        <ShoppingCartIcon id="cart"/>
-        </IconButton>
+          <IconButton>
+            <ShoppingCartIcon id="cart" />
+          </IconButton>
         </Link>
 
         {/* PROFILE */}
-        <IconButton>
-          <PersonOutlineIcon id="profile"/>
-        </IconButton>
+        <Link
+          key="profile"
+          variant="body2"
+          href="#"
+          className={classes.toolbarLink}
+          aria-controls="simple-menu"
+          aria-haspopup="true"
+          onClick={handleClickLogout}
+        >
+          <IconButton>
+            <PersonOutlineIcon id="profile" />
+          </IconButton>
+        </Link>
+        {props.isLoggedIn ? (
+          <Menu
+            id="profile-menu"
+            anchorEl={anchorElLogout}
+            keepMounted
+            open={Boolean(anchorElLogout)}
+            onClose={handleCloseLogout}
+          >
+            {/* // open={open ? open : !props.isLoggedIn} */}
+            <Link href="#">
+              {" "}
+              <MenuItem onClick={handleCloseLogout}>Logout</MenuItem>{" "}
+            </Link>
+          </Menu>
+        ) : null}
 
         {/* LOGIN/REGISTER */}
-        <LoginSignup/>
-
-
-
+        {props.isLoggedIn ? null : (
+          <LoginSignup
+            setLoggedIn={props.setLoggedIn}
+            isLoggedIn={props.isLoggedIn}
+          />
+        )}
       </Toolbar>
       {/* Nav Bar */}
-      <Toolbar component="nav" variant="dense" className={classes.toolbarSecondary}>
-        <Link color="inherit" noWrap key="Products" variant="body2" href="/products" className={classes.toolbarLink}>
+      <Toolbar
+        component="nav"
+        variant="dense"
+        className={classes.toolbarSecondary}
+      >
+        <Link
+          color="inherit"
+          noWrap
+          key="Products"
+          variant="body2"
+          href="/products"
+          className={classes.toolbarLink}
+        >
           Products
-          </Link>
-        <Link color="inherit" noWrap key="Services" variant="body2" href="#" className={classes.toolbarLink}
-          aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+        </Link>
+        <Link
+          color="inherit"
+          noWrap
+          key="Services"
+          variant="body2"
+          href="#"
+          className={classes.toolbarLink}
+          aria-controls="simple-menu"
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
           Services
-          </Link>
-          {/* Dropdown menu */}
+        </Link>
+        {/* Dropdown menu */}
         <Menu
-          id="simple-menu"
+          id="services-menu"
           anchorEl={anchorEl}
           keepMounted
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <Link href="/general-practitioners"> <MenuItem onClick={handleClose}>General Practitioners</MenuItem> </Link>
-          <Link href="/physio"> <MenuItem onClick={handleClose}>Physiotherapists</MenuItem> </Link>
+          <Link href="/general-practitioners">
+            {" "}
+            <MenuItem onClick={handleClose}>
+              General Practitioners
+            </MenuItem>{" "}
+          </Link>
+          <Link href="/physio">
+            {" "}
+            <MenuItem onClick={handleClose}>Physiotherapists</MenuItem>{" "}
+          </Link>
         </Menu>
-        <Link color="inherit" noWrap key="Book" variant="body2" href="/booking" className={classes.toolbarLink}>
+        <Link
+          color="inherit"
+          noWrap
+          key="Book"
+          variant="body2"
+          href="/booking"
+          className={classes.toolbarLink}
+        >
           Book
-          </Link>
-        <Link color="inherit" noWrap key="Store Locator" variant="body2" href="#" className={classes.toolbarLink}>
-          <LocationOnIcon/>
+        </Link>
+        <Link
+          color="inherit"
+          noWrap
+          key="Store Locator"
+          variant="body2"
+          href="#"
+          className={classes.toolbarLink}
+        >
+          <LocationOnIcon />
           Store Locator
-          </Link>
-
+        </Link>
       </Toolbar>
     </React.Fragment>
   );

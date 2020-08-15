@@ -1,27 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, setState, useEffect } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import {login} from "../api";
+import { login } from "../api";
 import jwt from "jwt-decode";
 import moment from "moment";
 
 // Styles
-import { makeStyles } from '@material-ui/core/styles';
-import Modal from '@material-ui/core/Modal';
-import Button from '@material-ui/core/Button';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import { makeStyles } from "@material-ui/core/styles";
+import Modal from "@material-ui/core/Modal";
+import Button from "@material-ui/core/Button";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
 //LOGIN and REGISTER
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Container from '@material-ui/core/Container';
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
+import Link from "@material-ui/core/Link";
+import Grid from "@material-ui/core/Grid";
+import Container from "@material-ui/core/Container";
 
 function getModalStyle() {
   return {
@@ -34,10 +34,10 @@ function getModalStyle() {
 const useStyles = makeStyles((theme) => ({
   //Modal
   paper: {
-    position: 'absolute',
+    position: "absolute",
     width: 600,
     backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
+    border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
     //Tab
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     },
     //Login and Register
     form: {
-      width: '100%', // Fix IE 11 issue.
+      width: "100%", // Fix IE 11 issue.
       marginTop: theme.spacing(3),
     },
     submit: {
@@ -79,55 +79,64 @@ function TabPanel(props) {
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
-// ============================ Component ============================ 
+// ============================ Component ============================
 
 export default function LoginSignup(props) {
+  // Initialization
+  let history = useHistory();
+  let location = useLocation();
 
-// Initialization
-let history = useHistory();
-let location = useLocation();
-const [username, setUserEmail] = useState("");
-const [password, setUserPassword] = useState("");
+  // console.log(location)
+  const [username, setUserEmail] = useState("");
+  const [password, setUserPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-// Fetch API
-const handleSubmit = (e) => {
-  e.preventDefault();
+  // Always ask to login for Private Routes
+  useEffect(() => {
+    if (!props.isLoggedIn && location.pathname === "/booking") {
+      setOpen(true);
+    } else {
+      setOpen(false);
+    }
+  }, [props.isLoggedIn]);
 
-  login({
-    email: username,
-    password: password,
-  })
-    .then((token) => {
-      const decoded = jwt(token);
-      console.log(decoded);
-      const expires = moment.unix(decoded.exp);
-      console.log(expires);
+  // Fetch API
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-      const isBeforeExpiry = moment().isBefore(expires);
-      console.log(isBeforeExpiry);
-
-      //todo
-      /*
-              once logged in, check local storage for token
-              decode token on other pages
-              check if exists & expiry
-          */
-      localStorage.setItem("token", token);
-      props.setLoginStatus(true);
-      history.push("/");
-      //localStorage.getItem('token'); //gets token
+    login({
+      email: username,
+      password: password,
     })
-    .catch((e) => {
-      console.log(e);
-    });
-};
+      .then((data) => {
+        if (data.status === 200) {
+          const token = data.headers.get("token");
+          const decoded = jwt(token);
+          console.log("decoded", decoded);
+          const expires = moment.unix(decoded.exp);
+          const isBeforeExpiry = moment().isBefore(expires);
+
+          localStorage.setItem("token", token);
+          // close modal here
+          setOpen(false);
+          history.push("/");
+
+          // Figure how to sync state, props and DOM ****
+        } else {
+          setErrorMessage(data.message);
+        }
+      })
+      .catch((e) => {
+        setErrorMessage(e);
+      });
+  };
 
   const classes = useStyles();
-  // getModalStyle is not a pure function, we roll the style only on the first render
+
   const [modalStyle] = React.useState(getModalStyle);
   const [open, setOpen] = React.useState(false);
   // Tab
@@ -147,163 +156,154 @@ const handleSubmit = (e) => {
 
   const body = (
     <div centered style={modalStyle} className={classes.paper}>
-            <div className={classes.root}>
-      <AppBar position="static">
-        <Tabs value={value} onChange={handleTabChange} aria-label="tabs">
-          <Tab label="Login" {...a11yProps(0)} />
-          <Tab label="Register" {...a11yProps(1)} />
-        </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0}>
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Tabs value={value} onChange={handleTabChange} aria-label="tabs">
+            <Tab label="Login" {...a11yProps(0)} />
+            <Tab label="Register" {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
+        <TabPanel value={value} index={0}>
+          <p class="error">{errorMessage}</p>
 
-        {/* Login Form starts */}
-        <Container component="main" maxWidth="xl">
-      <CssBaseline />
-        <Typography component="h1" variant="h5">
-        </Typography>
-        <form className={classes.form} noValidate onSubmit={handleSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            onChange={(e) => setUserEmail(e.currentTarget.value)}
-            value={username}
-            autoComplete="email"
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            onChange={(e) => setUserPassword(e.currentTarget.value)}
-            value={password}
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign In
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-    </Container>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-
-        {/* Register starts */}
-        <Container component="main" maxWidth="xl">
-      <CssBaseline />
-        <Typography component="h1" variant="h5">
-        </Typography>
-        <form className={classes.form} noValidate>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
-                variant="outlined"
-                required
-                fullWidth
-                id="firstName"
-                label="First Name"
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
+          {/* Login Form starts */}
+          <Container component="main" maxWidth="xl">
+            <CssBaseline />
+            <Typography component="h1" variant="h5"></Typography>
+            <form className={classes.form} noValidate onSubmit={handleSubmit}>
               <TextField
                 variant="outlined"
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
+                margin="normal"
                 required
                 fullWidth
                 id="email"
                 label="Email Address"
                 name="email"
+                onChange={(e) => setUserEmail(e.currentTarget.value)}
+                value={username}
                 autoComplete="email"
+                autoFocus
               />
-            </Grid>
-            <Grid item xs={12}>
               <TextField
                 variant="outlined"
+                margin="normal"
                 required
                 fullWidth
                 name="password"
+                onChange={(e) => setUserPassword(e.currentTarget.value)}
+                value={password}
                 label="Password"
                 type="password"
                 id="password"
                 autoComplete="current-password"
               />
-            </Grid>
-            <Grid item xs={12}>
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign Up
-          </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="#" variant="body2">
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-    </Container>
-      </TabPanel>
-    </div>
+              <FormControlLabel
+                control={<Checkbox value="remember" color="primary" />}
+                label="Remember me"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Sign In
+              </Button>
+              <Grid container>
+                <Grid item xs>
+                  <Link href="#" variant="body2">
+                    Forgot password?
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link href="#" variant="body2">
+                    {"Don't have an account? Sign Up"}
+                  </Link>
+                </Grid>
+              </Grid>
+            </form>
+          </Container>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          {/* Register starts */}
+          <Container component="main" maxWidth="xl">
+            <CssBaseline />
+            <Typography component="h1" variant="h5"></Typography>
+            <form className={classes.form} noValidate>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    autoComplete="fname"
+                    name="firstName"
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="lname"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                  />
+                </Grid>
+                <Grid item xs={12}></Grid>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Sign Up
+              </Button>
+              <Grid container justify="flex-end">
+                <Grid item>
+                  <Link href="#" variant="body2">
+                    Already have an account? Sign in
+                  </Link>
+                </Grid>
+              </Grid>
+            </form>
+          </Container>
+        </TabPanel>
+      </div>
     </div>
   );
 
-// =============================== Functionality ===============================
-
-
-
-
-
-
+  // =============================== Functionality ===============================
 
   return (
     <div>
@@ -311,10 +311,11 @@ const handleSubmit = (e) => {
         Open Modal
       </button> */}
       <Button variant="outlined" size="small" onClick={handleModalOpen}>
-          Sign In / Sign Up
-        </Button>
+        Sign In / Sign Up
+      </Button>
       <Modal
-      id="loginModal"
+        id="loginModal"
+        // open={open ? open : !props.isLoggedIn}
         open={open}
         onClose={handleModalClose}
         aria-labelledby="simple-modal-title"
@@ -324,4 +325,4 @@ const handleSubmit = (e) => {
       </Modal>
     </div>
   );
-    }
+}

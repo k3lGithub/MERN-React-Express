@@ -1,12 +1,8 @@
-import React from "react";
-import './App.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
-
-import Button from '@material-ui/core/Button';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import jwt from "jwt-decode";
+import moment from "moment";
 
 import Nav from "./components/common/Nav";
 import Home from "./components/page/Home";
@@ -17,76 +13,73 @@ import SearchResult from "./components/page/cart/SearchResult";
 import Book from "./components/page/service/BookPage";
 import GP from "./components/page/service/GpPage";
 import Physio from "./components/page/service/PhysioPage";
-import LoginSignup from './components/LoginSignup'; // or a modal
-
-
+// import LoginSignup from './components/LoginSignup'; // or a modal
+import PrivateRoute from "./components/common/PrivateRoute";
 
 // When App loads the first time/refreshed
-const isLoggedIn = () => {
-  if (window.localStorage.getItem("token")) {
-    return true;
+export const isLoggedIn = () => {
+  const token = window.localStorage.getItem("token");
+  console.log("token", token);
+
+  if (token) {
+    const decoded = jwt(token);
+    const expires = moment.unix(decoded.exp);
+
+    //true if token exists & expiry < current time
+    return moment().isBefore(expires);
   } else {
     return false;
   }
 };
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(isLoggedIn);
 
   return (
     <Router>
-    <div className="App">
-      {/* <Header/> */}
-      <Nav/>
-      {/* <header className="App-header">
-      </header> */}
+      <div className="App">
+        <Nav setLoggedIn={isLoggedIn} isLoggedIn={loggedIn} />
 
-      <Switch>
-
+        <Switch>
           {/* replace with modal */}
-          <Route path="/login">
+          {/* <Route path="/login">
             <p>This is login</p>
-          </Route>
+          </Route> */}
 
           <Route path="/search/results">
-            <SearchResult/>
+            <SearchResult />
           </Route>
 
           <Route path="/products">
-            <Products/>
+            <Products />
           </Route>
 
           <Route path="/product/:id">
-            <Product/>
+            <Product />
           </Route>
 
           <Route path="/checkout">
-            <Checkout/>
+            <Checkout />
           </Route>
 
-          <Route path="/booking">
-            <Book/>
-          </Route>
+          <PrivateRoute path="/booking" setLoginStatus={setLoggedIn}>
+            <Book />
+          </PrivateRoute>
 
           <Route path="/general-practitioners">
-            <GP/>
+            <GP />
           </Route>
 
           <Route path="/physio">
-            <Physio/>
+            <Physio />
           </Route>
 
           <Route path="/">
-            <Home/>
+            <Home />
           </Route>
-
-      </Switch>
-
-      <Button variant="contained" color="primary">
-      Hello
-    </Button>
-    </div>
+        </Switch>
+      </div>
     </Router>
-
   );
 }
 

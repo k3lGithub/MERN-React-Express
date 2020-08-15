@@ -1,6 +1,6 @@
 import React, { useState, setState, useEffect } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { login } from "../api";
+import { login, register } from "../api";
 import jwt from "jwt-decode";
 import moment from "moment";
 
@@ -91,9 +91,14 @@ export default function LoginSignup(props) {
   let location = useLocation();
 
   // console.log(location)
-  const [username, setUserEmail] = useState("");
+  const [email, setUserEmail] = useState("");
   const [password, setUserPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [registerError, setRegisterError] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhoneNumber] = useState("");
+  const [postcode, setPostcode] = useState("");
 
   // Always ask to login for Private Routes
   useEffect(() => {
@@ -104,12 +109,21 @@ export default function LoginSignup(props) {
     }
   }, [props.isLoggedIn]);
 
-  // Fetch API
-  const handleSubmit = (e) => {
+  const redirectAndUpdate = async () => {
+    // close modal here
+    setOpen(false);
+    // history.push("/");
+    // Figure how to sync state, props and DOM ****
+    // Temp workaround
+    window.location.reload(false);
+  };
+
+  // Fetch Login API
+  const handleSubmitLogin = (e) => {
     e.preventDefault();
 
     login({
-      email: username,
+      email: email,
       password: password,
     })
       .then((data) => {
@@ -121,39 +135,58 @@ export default function LoginSignup(props) {
           const isBeforeExpiry = moment().isBefore(expires);
 
           localStorage.setItem("token", token);
-          // close modal here
-          setOpen(false);
-          history.push("/");
-
-          // Figure how to sync state, props and DOM ****
+          redirectAndUpdate();
         } else {
-          setErrorMessage(data.message);
+          setLoginError(data.message);
         }
       })
       .catch((e) => {
-        setErrorMessage(e);
+        setLoginError(e);
+      });
+  };
+
+  // Fetch Register API
+  const handleSubmitRegister = (e) => {
+    e.preventDefault();
+
+    register({
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      password: password,
+      phone: phone,
+      postcode: postcode,
+    })
+      .then((data) => {
+        if (data.status === 200) {
+          setRegisterError("");
+          alert("Registration Successful! Please login.");
+          redirectAndUpdate();
+          // form not opening again
+          // setOpen(true);
+        } else {
+          setRegisterError(data.message);
+        }
+      })
+      .catch((e) => {
+        setRegisterError(e.message);
       });
   };
 
   const classes = useStyles();
-
   const [modalStyle] = React.useState(getModalStyle);
   const [open, setOpen] = React.useState(false);
   // Tab
   const [value, setValue] = React.useState(0);
-
   const handleModalOpen = () => {
     setOpen(true);
   };
-
   const handleModalClose = () => {
     setOpen(false);
   };
-
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
   };
-
   const body = (
     <div centered style={modalStyle} className={classes.paper}>
       <div className={classes.root}>
@@ -164,13 +197,17 @@ export default function LoginSignup(props) {
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
-          <p class="error">{errorMessage}</p>
+          <p class="error">{loginError}</p>
 
           {/* Login Form starts */}
           <Container component="main" maxWidth="xl">
             <CssBaseline />
             <Typography component="h1" variant="h5"></Typography>
-            <form className={classes.form} noValidate onSubmit={handleSubmit}>
+            <form
+              className={classes.form}
+              noValidate
+              onSubmit={handleSubmitLogin}
+            >
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -180,7 +217,7 @@ export default function LoginSignup(props) {
                 label="Email Address"
                 name="email"
                 onChange={(e) => setUserEmail(e.currentTarget.value)}
-                value={username}
+                value={email}
                 autoComplete="email"
                 autoFocus
               />
@@ -227,10 +264,15 @@ export default function LoginSignup(props) {
         </TabPanel>
         <TabPanel value={value} index={1}>
           {/* Register starts */}
+          <p class="error">{registerError}</p>
           <Container component="main" maxWidth="xl">
             <CssBaseline />
             <Typography component="h1" variant="h5"></Typography>
-            <form className={classes.form} noValidate>
+            <form
+              className={classes.form}
+              noValidate
+              onSubmit={handleSubmitRegister}
+            >
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -240,6 +282,8 @@ export default function LoginSignup(props) {
                     required
                     fullWidth
                     id="firstName"
+                    onChange={(e) => setFirstName(e.currentTarget.value)}
+                    value={firstName}
                     label="First Name"
                     autoFocus
                   />
@@ -250,8 +294,36 @@ export default function LoginSignup(props) {
                     required
                     fullWidth
                     id="lastName"
+                    onChange={(e) => setLastName(e.currentTarget.value)}
+                    value={lastName}
                     label="Last Name"
                     name="lastName"
+                    autoComplete="lname"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="phone"
+                    onChange={(e) => setPhoneNumber(e.currentTarget.value)}
+                    value={phone}
+                    label="Phone Number"
+                    name="phone"
+                    autoComplete="lname"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="postcode"
+                    onChange={(e) => setPostcode(e.currentTarget.value)}
+                    value={postcode}
+                    label="Postcode"
+                    name="postcode"
                     autoComplete="lname"
                   />
                 </Grid>
@@ -261,6 +333,8 @@ export default function LoginSignup(props) {
                     required
                     fullWidth
                     id="email"
+                    onChange={(e) => setUserEmail(e.currentTarget.value)}
+                    value={email}
                     label="Email Address"
                     name="email"
                     autoComplete="email"
@@ -275,6 +349,8 @@ export default function LoginSignup(props) {
                     label="Password"
                     type="password"
                     id="password"
+                    onChange={(e) => setUserPassword(e.currentTarget.value)}
+                    value={password}
                     autoComplete="current-password"
                   />
                 </Grid>

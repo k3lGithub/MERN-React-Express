@@ -37,9 +37,11 @@ router.post("/register", async (req, res) => {
   // Validation: Do not create if same email exist
   if (foundUser) {
     // come back to setup proper error handling
-    res.send(
-      "An account with this email exists. Please login or reset your password if you have forgotten."
-    );
+    res.json({
+      status: 402,
+      message:
+        "An account with this email exists. Please login or reset your password if you have forgotten.",
+    });
   } else {
     const pw = req.body.password;
     // Encrypt password
@@ -50,10 +52,16 @@ router.post("/register", async (req, res) => {
     try {
       const createdUser = await User.create(req.body);
       console.log(createdUser, " created user");
-      res.status(200).send("User created successfully");
+      res.json({
+        status: 200,
+        message: "User created successfully",
+      });
     } catch (err) {
       // come back to setup proper error handling
-      res.status(404).send(err);
+      res.json({
+        status: 404,
+        message: err.message,
+      });
     }
   }
 });
@@ -105,7 +113,6 @@ router.post("/login", async (req, res) => {
       status: 400,
       message: err,
     });
-    console.log(err);
   }
 });
 

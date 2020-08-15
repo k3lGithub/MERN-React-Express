@@ -48,14 +48,16 @@ export default function Nav(props) {
 
   const handleCloseLogout = () => {
     setAnchorElLogout(null);
+  };
+
+  const handleLogout = () => {
+    setAnchorElLogout(null);
     window.localStorage.clear();
     console.log(props.isLoggedIn);
     history.push("/");
     // Figure how to sync state, props and DOM
-    // this.forceUpdate();
-    // window.location.reload(true);
-    // props.setLoggedIn();
-    // console.log("here")
+    // Temp workaround
+    window.location.reload(false);
   };
 
   const handleClick = (event) => {
@@ -122,7 +124,7 @@ export default function Nav(props) {
             {/* // open={open ? open : !props.isLoggedIn} */}
             <Link href="#">
               {" "}
-              <MenuItem onClick={handleCloseLogout}>Logout</MenuItem>{" "}
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>{" "}
             </Link>
           </Menu>
         ) : null}

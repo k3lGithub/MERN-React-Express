@@ -3,6 +3,8 @@ const featchHeaderToken = {
   token: window.localStorage.getItem("token"),
 };
 
+// ======================= USER =======================
+
 export async function login(userDetails) {
   // LOGIN
   const result = await fetch("/api/user/login", {
@@ -25,6 +27,45 @@ export async function register(userDetails) {
   const result = await fetch("/api/user/register", {
     method: "POST",
     body: JSON.stringify(userDetails),
+    headers: featchHeaderToken,
+  });
+  const data = await result.json();
+  return data;
+}
+
+// ======================= Doctor =======================
+
+export async function getDoctors() {
+  const result = await fetch("/api/doctor", {
+    method: "GET",
+  });
+  const data = await result.json();
+  return data;
+}
+
+export async function getDoctorsbyId(id) {
+  const result = await fetch("/api/doctor/" + id, {
+    method: "GET",
+    headers: featchHeaderToken,
+  });
+  const data = await result.json();
+  return data;
+}
+
+// ======================= Booking =======================
+
+export async function getBookings() {
+  const result = await fetch("/api/booking", {
+    method: "GET",
+  });
+  const data = await result.json();
+  return data;
+}
+
+export async function newBooking(bookingDetails) {
+  const result = await fetch("/api/booking/new", {
+    method: "POST",
+    body: JSON.stringify(bookingDetails),
     headers: featchHeaderToken,
   });
   const data = await result.json();

@@ -110,11 +110,11 @@ export default function LoginSignup(props) {
   }, [props.isLoggedIn]);
 
   const redirectAndUpdate = async () => {
-    // close modal here
+    // close modal
     setOpen(false);
     // history.push("/");
     // Figure how to sync state, props and DOM ****
-    // Temp workaround
+    // Temp workaround is
     window.location.reload(false);
   };
 
@@ -133,7 +133,6 @@ export default function LoginSignup(props) {
           console.log("decoded", decoded);
           const expires = moment.unix(decoded.exp);
           const isBeforeExpiry = moment().isBefore(expires);
-
           localStorage.setItem("token", token);
           redirectAndUpdate();
         } else {
@@ -162,8 +161,6 @@ export default function LoginSignup(props) {
           setRegisterError("");
           alert("Registration Successful! Please login.");
           redirectAndUpdate();
-          // form not opening again
-          // setOpen(true);
         } else {
           setRegisterError(data.message);
         }
@@ -197,7 +194,7 @@ export default function LoginSignup(props) {
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
-          <p class="error">{loginError}</p>
+          <p className="errorMessage">{loginError}</p>
 
           {/* Login Form starts */}
           <Container component="main" maxWidth="xl">
@@ -264,7 +261,7 @@ export default function LoginSignup(props) {
         </TabPanel>
         <TabPanel value={value} index={1}>
           {/* Register starts */}
-          <p class="error">{registerError}</p>
+          <p className="errorMessage">{registerError}</p>
           <Container component="main" maxWidth="xl">
             <CssBaseline />
             <Typography component="h1" variant="h5"></Typography>
@@ -383,9 +380,6 @@ export default function LoginSignup(props) {
 
   return (
     <div>
-      {/* <button type="button" onClick={handleOpen}>
-        Open Modal
-      </button> */}
       <Button variant="outlined" size="small" onClick={handleModalOpen}>
         Sign In / Sign Up
       </Button>

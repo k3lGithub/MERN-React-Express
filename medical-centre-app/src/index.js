@@ -7,6 +7,8 @@ import * as serviceWorker from './serviceWorker';
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    <script src="https://smtpjs.com/v3/smtp.js">
+</script>
   </React.StrictMode>,
   document.getElementById('root')
 );

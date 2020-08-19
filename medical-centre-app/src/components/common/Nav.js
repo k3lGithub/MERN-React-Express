@@ -126,6 +126,9 @@ export default function Nav(props) {
               {" "}
               <MenuItem onClick={handleLogout}>Logout</MenuItem>{" "}
             </Link>
+            <Link href="/mybooking">
+              <MenuItem>My Booking</MenuItem>
+            </Link>
           </Menu>
         ) : null}
 

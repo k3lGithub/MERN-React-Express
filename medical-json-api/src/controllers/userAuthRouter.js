@@ -29,9 +29,6 @@ router.get("/", async (req, res, next) => {
 
 // Register New User
 router.post("/register", async (req, res) => {
-  // let userExist = false;
-  // userExist = await checkUserExist(req);
-  // await console.log(userExist);
   const foundUser = await findUserEmail(req);
 
   // Validation: Do not create if same email exist
@@ -93,8 +90,6 @@ router.post("/login", async (req, res) => {
           });
         });
       } else {
-        // req.session.message = 'Username or Password incorrect';
-
         res.status(401).json({
           status: 401,
           message: "Wrong password. Try again",
@@ -123,7 +118,7 @@ router.use((req, res, next) => {
     if (!err) {
       req.user = decode; //store user info on request object
       console.log(decode);
-      next(); //middleware complete, move to next endpoint
+      next();
     } else {
       res.json({
         status: 401,
@@ -132,19 +127,5 @@ router.use((req, res, next) => {
     }
   });
 });
-
-// add update password
-
-//   // Logout - handle jwt token - to be worked on
-//   router.get('/logout', async(req, res) => {
-
-//     req.session.destroy((err) => {
-//         if(err){
-//           res.send(err);
-//         } else {
-//           res.redirect('/');// back to the homepage
-//         }
-//       })
-//   })
 
 module.exports = router;

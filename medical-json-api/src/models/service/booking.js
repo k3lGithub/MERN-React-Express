@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const BookingSchema = new mongoose.Schema({
   owner: String,
   doctorId: String,
-  day: String,
-  time: String
+  date: String,
+  time: String,
 });
 
-module.exports = mongoose.model('Booking', BookingSchema);
+module.exports = mongoose.model("Booking", BookingSchema);

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { getDoctors } from "./api";
+
 import "./App.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import jwt from "jwt-decode";
@@ -11,21 +13,19 @@ import Product from "./components/page/cart/ProductPage";
 import Checkout from "./components/page/cart/Checkout";
 import SearchResult from "./components/page/cart/SearchResult";
 import Book from "./components/page/service/BookPage";
+import MyBooking from "./components/page/service/MyBooking";
 import GP from "./components/page/service/GpPage";
 import Physio from "./components/page/service/PhysioPage";
 // import LoginSignup from './components/LoginSignup'; // or a modal
 import PrivateRoute from "./components/common/PrivateRoute";
 
-// When App loads the first time/refreshed
 export const isLoggedIn = () => {
   const token = window.localStorage.getItem("token");
-  console.log("token", token);
+  // console.log("token", token);
 
   if (token) {
     const decoded = jwt(token);
     const expires = moment.unix(decoded.exp);
-
-    //true if token exists & expiry < current time
     return moment().isBefore(expires);
   } else {
     return false;
@@ -34,6 +34,17 @@ export const isLoggedIn = () => {
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(isLoggedIn);
+  let [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    refreshDoctors();
+  }, []);
+
+  const refreshDoctors = async () => {
+    const data = await getDoctors();
+    console.log(data.data[0]);
+    setDoctors(data.data);
+  };
 
   return (
     <Router>
@@ -62,16 +73,24 @@ function App() {
             <Checkout />
           </Route>
 
+          <PrivateRoute
+            path="/mybooking"
+            setLoginStatus={setLoggedIn}
+            loggedIn={loggedIn}
+          >
+            <MyBooking />
+          </PrivateRoute>
+
           <PrivateRoute path="/booking" setLoginStatus={setLoggedIn}>
-            <Book />
+            <Book doctors={doctors} />
           </PrivateRoute>
 
           <Route path="/general-practitioners">
-            <GP />
+            <GP doctors={doctors} />
           </Route>
 
           <Route path="/physio">
-            <Physio />
+            <Physio doctors={doctors} />
           </Route>
 
           <Route path="/">

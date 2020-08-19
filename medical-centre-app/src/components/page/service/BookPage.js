@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import { newBooking } from "../../../api";
+import { useHistory } from "react-router-dom";
+import jwt from "jwt-decode";
 
 // grid
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 
 import TextField from "@material-ui/core/TextField";
 
 // dropdowns
 import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import ListSubheader from "@material-ui/core/ListSubheader";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
@@ -34,7 +34,6 @@ import clsx from "clsx";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
 import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
@@ -51,17 +50,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
-
-  // chips: {
-  //   display: 'flex',
-  //   flexWrap: 'wrap',
-  // },
-  // chip: {
-  //   margin: 2,
-  // },
-  // noLabel: {
-  //   marginTop: theme.spacing(3),
-  // },
   radioRoot: {
     "&:hover": {
       backgroundColor: "transparent",
@@ -130,25 +118,68 @@ function StyledRadio(props) {
 }
 
 export default function Booking(props) {
+  let history = useHistory();
   const classes = useStyles();
 
+  const [doctorId, setDoctorId] = useState("");
+  const [time, setTime] = useState("");
+  const [error, setError] = useState("");
+
+  console.log(props.doctors[1]);
+  const gp = props.doctors.filter(
+    (doctor) => doctor.specialization == "General Practitioner"
+  );
+  const physio = props.doctors.filter(
+    (doctor) => doctor.specialization == "Physiotherapist"
+  );
+  console.log("gp", physio);
+
   const [selectedDate, setSelectedDate] = React.useState(
-    new Date("2014-08-18T21:11:54")
+    new Date("2018-09-17T21:11:54")
+    // new moment().format()
+    // add time conversion here
   );
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    newBooking({
+      owner: jwt(window.localStorage.getItem("token")).userId,
+      doctorId: doctorId,
+      date: selectedDate,
+      time: time,
+    }).then((data) => {
+      console.log(data);
+      if (data.status.code === 200) {
+        alert("Booking Sucessful");
+        window.location.reload(false);
+        history.push("/mybooking");
+        // Later to redirect to My Booking
+      } else {
+        setError(data.status.message);
+      }
+    });
+  };
+
   return (
     <React.Fragment>
       <div className={classes.gridRoot}>
+        <p className="errorMessage">{error}</p>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <form className={classes.formRoot} noValidate autoComplete="off">
+            <form
+              className={classes.formRoot}
+              noValidate
+              autoComplete="off"
+              onSubmit={handleSubmit}
+            >
               <Grid item xs={12}>
-                <TextField required id="standard-required" label="First Name" />
-                <TextField required id="standard-required" label="Last Name" />
+                <TextField id="standard-required" label="First Name" />
+                <TextField id="standard-required" label="Last Name" />
               </Grid>
 
               {/* DOCTOR */}
@@ -157,15 +188,21 @@ export default function Booking(props) {
                   <InputLabel htmlFor="grouped-native-select">
                     Doctor
                   </InputLabel>
-                  <Select native defaultValue="" id="grouped-native-select">
+                  <Select
+                    native
+                    id="grouped-native-select"
+                    onChange={(e) => setDoctorId(e.currentTarget.value)}
+                  >
                     <option aria-label="None" value="" />
                     <optgroup label="general-practitioners">
-                      <option value={1}>Placeholder 1</option>
-                      <option value={2}>Placeholder 2</option>
+                      {gp.map((gp) => (
+                        <option value={gp._id}>{gp.name}</option>
+                      ))}
                     </optgroup>
                     <optgroup label="Physiotherapists">
-                      <option value={3}>placeholder 3</option>
-                      <option value={4}>Placeholder 4</option>
+                      {physio.map((physio) => (
+                        <option value={physio._id}>{physio.name}</option>
+                      ))}
                     </optgroup>
                   </Select>
                 </FormControl>
@@ -176,6 +213,7 @@ export default function Booking(props) {
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                   <Grid container justify="space-around">
                     <KeyboardDatePicker
+                      required
                       disableToolbar
                       variant="inline"
                       format="dd/MM/yyyy"
@@ -193,26 +231,6 @@ export default function Booking(props) {
               </Grid>
 
               {/* TIME */}
-              {/* <FormControl className={classes.formControl}>
-                <InputLabel shrink htmlFor="select-multiple-native">
-                  Native
-        </InputLabel>
-                <Select
-                  multiple
-                  native
-                  value={timeSlots}
-                  onChange={handleChangeMultiple}
-                  inputProps={{
-                    id: 'select-multiple-native',
-                  }}
-                >
-                  {timeSlots.map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl> */}
               <Grid item xs={12}>
                 <FormControl className={classes.formControl}>
                   <InputLabel shrink htmlFor="select-multiple-native">
@@ -229,12 +247,13 @@ export default function Booking(props) {
                         value={time}
                         control={<StyledRadio />}
                         label={time}
+                        onChange={(e) => setTime(e.currentTarget.value)}
                       />
                     ))}
                   </RadioGroup>
                 </FormControl>
                 <div>
-                  <Button variant="contained" color="primary">
+                  <Button variant="contained" color="primary" type="submit">
                     Book
                   </Button>
                 </div>

@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "build": "sh ./build.sh",
+        "start": "cd medical-json-api && node ./server.js"
+    }
+}

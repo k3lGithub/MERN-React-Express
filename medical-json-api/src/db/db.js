@@ -2,7 +2,8 @@
 const mongoose = require("mongoose");
 
 // that is automatically created
-mongoose.connect("mongodb://localhost/medicalCentre", {
+const uri = process.env.MONGODB_URI || 'mongodb://localhost/moviesOne';
+mongoose.connect(uri, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,

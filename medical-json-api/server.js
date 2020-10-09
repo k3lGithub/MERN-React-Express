@@ -1,24 +1,12 @@
-const express        = require('express');
-const app            = express();
-const bodyParser     = require('body-parser');
-const cors           = require('cors');
-// const session        = require('express-session')
-
+const app = require('./app')
 require('./src/db/db');
 
-// SET UP CORS AS MIDDLEWARE, SO any client can make a request to our server
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+app.listen(process.env.PORT || 9000, () => {
+  console.log('listening on port 9000');
+});
 
 
-// app.use(session({
-//   secret: 'cookieseceret',
-//   resave: false,
-//   saveUninitialized: false
-// }));
 
-// CORS allows requests to come in from React
-app.use(cors());
 
 // Require the controller after the middleware
 const userAuthRouter  = require('./src/controllers/userAuthRouter');
@@ -35,6 +23,3 @@ app.use('/api/booking', bookingRouter);
 app.use('/api/cart', cartRouter);
 
 
-app.listen(process.env.PORT || 9000, () => {
-  console.log('listening on port 9000');
-});

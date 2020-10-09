@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getDoctors } from "./api";
+import { getDoctors, getProducts } from "./api";
 
 import "./App.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
@@ -35,9 +35,11 @@ export const isLoggedIn = () => {
 function App() {
   const [loggedIn, setLoggedIn] = useState(isLoggedIn);
   let [doctors, setDoctors] = useState([]);
+  let [products, setProducts] = useState([]);
 
   useEffect(() => {
     refreshDoctors();
+    refreshProducts();
   }, []);
 
   const refreshDoctors = async () => {
@@ -46,10 +48,16 @@ function App() {
     setDoctors(data.data);
   };
 
+  const refreshProducts = async () => {
+    const data = await getProducts();
+    console.log(data.data[0]);
+    setProducts(data.data);
+  };
+
   return (
     <Router>
       <div className="App">
-        <Nav setLoggedIn={isLoggedIn} isLoggedIn={loggedIn} />
+        <Nav setLoggedIn={isLoggedIn} isLoggedIn={loggedIn} products={products} />
 
         <Switch>
           {/* replace with modal */}
@@ -62,11 +70,11 @@ function App() {
           </Route>
 
           <Route path="/products">
-            <Products />
+            <Products products={products}/>
           </Route>
 
           <Route path="/product/:id">
-            <Product />
+            <Product/>
           </Route>
 
           <Route path="/checkout">

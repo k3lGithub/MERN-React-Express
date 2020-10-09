@@ -71,3 +71,23 @@ export async function newBooking(bookingDetails) {
   const data = await result.json();
   return data;
 }
+
+
+// ======================= Products =======================
+
+export async function getProducts() {
+  const result = await fetch("/api/product", {
+    method: "GET",
+  });
+  const data = await result.json();
+  return data;
+}
+
+export async function getProductsbyId(id) {
+  const result = await fetch("/api/product/" + id, {
+    method: "GET",
+    headers: featchHeaderToken,
+  });
+  const data = await result.json();
+  return data;
+}

@@ -16,3 +16,13 @@
   color: #d8000c;
   font-style: italic;
 }
+
+/* title */
+.MuiTypography-root.MuiTypography-h5.MuiTypography-gutterBottom {
+  font-size: 1.2em;
+}
+
+/* price */
+.MuiTypography-root.MuiTypography-body2.MuiTypography-colorTextSecondary {
+  color: black;
+}

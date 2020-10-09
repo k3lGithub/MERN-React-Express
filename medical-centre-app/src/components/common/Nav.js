@@ -1,4 +1,5 @@
 import React from "react";
+import Search from "./Search";
 import { useHistory } from "react-router-dom";
 import logo from "../../medicalLogo.png";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +15,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import LoginSignup from "../LoginSignup";
+
 
 // Material-UI styles
 const useStyles = makeStyles((theme) => ({
@@ -85,7 +87,8 @@ export default function Nav(props) {
           Medical Centre
         </Typography>
 
-        <TextField id="search" label="Search" variant="outlined" />
+        {/* <TextField id="search" label="Search" variant="outlined" /> */}
+        < Search products={props.products}/>
 
         {/* SEARCH */}
         <IconButton>

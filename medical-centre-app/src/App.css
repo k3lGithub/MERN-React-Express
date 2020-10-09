@@ -26,3 +26,9 @@
 .MuiTypography-root.MuiTypography-body2.MuiTypography-colorTextSecondary {
   color: black;
 }
+
+#adminLogo {
+  width: 2em;
+  height: 2em;
+}
+

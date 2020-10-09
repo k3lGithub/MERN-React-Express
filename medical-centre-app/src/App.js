@@ -18,6 +18,9 @@ import GP from "./components/page/service/GpPage";
 import Physio from "./components/page/service/PhysioPage";
 // import LoginSignup from './components/LoginSignup'; // or a modal
 import PrivateRoute from "./components/common/PrivateRoute";
+import Admin from "./components/page/cart/AdminPage";
+
+
 
 export const isLoggedIn = () => {
   const token = window.localStorage.getItem("token");
@@ -32,14 +35,17 @@ export const isLoggedIn = () => {
   }
 };
 
+
 function App() {
   const [loggedIn, setLoggedIn] = useState(isLoggedIn);
+  const [admin, setAdmin] = useState(false);
   let [doctors, setDoctors] = useState([]);
   let [products, setProducts] = useState([]);
 
   useEffect(() => {
     refreshDoctors();
     refreshProducts();
+    verifyAdmin();
   }, []);
 
   const refreshDoctors = async () => {
@@ -54,10 +60,20 @@ function App() {
     setProducts(data.data);
   };
 
+  const verifyAdmin = () => {
+    const token = window.localStorage.getItem("token");
+    if (token) {
+      if (jwt(token).user == "admin@admin.com"){
+        setAdmin(true);
+      }
+    }
+  }
+ 
+
   return (
     <Router>
       <div className="App">
-        <Nav setLoggedIn={isLoggedIn} isLoggedIn={loggedIn} products={products} />
+        <Nav setLoggedIn={isLoggedIn} isLoggedIn={loggedIn} products={products} admin={admin} />
 
         <Switch>
           {/* replace with modal */}
@@ -92,6 +108,12 @@ function App() {
           <PrivateRoute path="/booking" setLoginStatus={setLoggedIn}>
             <Book doctors={doctors} />
           </PrivateRoute>
+
+          {admin == true ?
+          (<PrivateRoute path="/admin">
+            <Admin admin={admin} />
+          </PrivateRoute>) : null}
+
 
           <Route path="/general-practitioners">
             <GP doctors={doctors} />

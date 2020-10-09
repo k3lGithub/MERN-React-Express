@@ -16,7 +16,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import LoginSignup from "../LoginSignup";
 
-
 // Material-UI styles
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -74,7 +73,9 @@ export default function Nav(props) {
     <React.Fragment>
       <Toolbar className={classes.toolbar}>
         {/* Header  */}
-        <img src={logo} className="App-logo" alt="logo" />
+        <Link href="/home">
+          <img src={logo} className="App-logo" alt="logo" />
+        </Link>
         <Typography
           component="h2"
           variant="h5"
@@ -88,7 +89,7 @@ export default function Nav(props) {
         </Typography>
 
         {/* <TextField id="search" label="Search" variant="outlined" /> */}
-        < Search products={props.products}/>
+        <Search products={props.products} />
 
         {/* SEARCH */}
         <IconButton>
@@ -132,6 +133,12 @@ export default function Nav(props) {
             <Link href="/mybooking">
               <MenuItem>My Booking</MenuItem>
             </Link>
+
+            {props.admin ? (
+              <Link href="/admin">
+                <MenuItem>Admin</MenuItem>
+              </Link>
+            ) : null}
           </Menu>
         ) : null}
 

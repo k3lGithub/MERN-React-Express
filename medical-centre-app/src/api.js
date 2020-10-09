@@ -91,3 +91,34 @@ export async function getProductsbyId(id) {
   const data = await result.json();
   return data;
 }
+
+export async function addProduct(details) {
+  const result = await fetch("/api/product/new", {
+    method: "POST",
+    headers: featchHeaderToken,
+    body: JSON.stringify(details),
+  });
+
+  console.log("details",result)
+  const data = await result.json();
+  return data;
+}
+
+export async function deleteProduct(id) {
+  const result = await fetch("/api/product/delete/" + id, {
+    method: "DELETE",
+    headers: featchHeaderToken,
+  });
+  const data = await result.json();
+  return data;
+}
+
+export const updateProduct = async (id, details) => {
+  const result = await fetch(`/api/v1/movies/${id}`, {
+    method: "PUT",
+    headers: featchHeaderToken,
+    body: JSON.stringify(details),
+  });
+  const data = await result.json();
+  return data;
+};

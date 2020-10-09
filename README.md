@@ -52,7 +52,7 @@ App also offer an online chemist channel for easier access to non-prescription p
 ![homepage](wireframe_homepage.png)
 ![search](wireframe_search.png)
 ![login](wireframe_login.png)
-![register](wireframe_register.png)
+![register](wireframe_Register.png)
 ![products](wireframe_products.png)
 ![filters](wireframe_filters.png)
 ![booking](wireframe_booking.png)

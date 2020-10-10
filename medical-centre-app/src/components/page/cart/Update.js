@@ -17,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-// Place holder to update product
+// Refactor later to use by components to share, rather than per page for add, delete, update
+// Refactor later to use React Router to reset states, rather than manual clean up
 
 export default function Update(props) {
 
@@ -54,12 +55,12 @@ const displayItem = async () => {
           setMsg("Product found.");
           setItem(data);
           showItem(true);
-          // setTitle(item.name)
-    // setImage(item.img);
-    // setCategory(item.category);
-    // setDescription(item.description);
-    // setPrice(item.price);
-    // setStock(item.stock);
+          setTitle(data.name)
+    setImage(data.img);
+    setCategory(data.category);
+    setDescription(data.description);
+    setPrice(data.price);
+    setStock(data.stock);
       } else {
           await setMsg("Enter Product ID");
       }
@@ -72,6 +73,8 @@ const displayItem = async () => {
 const updateItem = async (details) => {
   try {
     const data = await updateProduct(id, details);
+    clearForm();
+    showItem(false);
     setMsg("Product has been sucessfully updated.");
   } catch (e) {
     setMsg("Something has went wrong. Check fields and try again.");
@@ -89,7 +92,6 @@ const submitForm = (e) => {
     "category": category,
     "stock": stock,
   });
-  clearForm();
 };
 
 
@@ -135,7 +137,7 @@ const submitForm = (e) => {
             id="title"
             label="Title"
             variant="filled"
-            value={item.name}
+            value={title}
             onChange={(e) => setTitle(e.currentTarget.value)}
           />
           <TextField
@@ -144,7 +146,7 @@ const submitForm = (e) => {
             id="image"
             label="Image"
             variant="filled"
-            value={item.img}
+            value={image}
             onChange={(e) => setImage(e.currentTarget.value)}
           />
         </div>
@@ -155,7 +157,7 @@ const submitForm = (e) => {
             id="category"
             label="Category"
             variant="filled"
-            value={item.category}
+            value={category}
             onChange={(e) => setCategory(e.currentTarget.value)}
           />
           <TextField
@@ -164,7 +166,7 @@ const submitForm = (e) => {
             multiline
             rows={4}
             variant="filled"
-            value={item.description}
+            value={description}
             onChange={(e) => setDescription(e.currentTarget.value)}
           />
         </div>
@@ -176,7 +178,7 @@ const submitForm = (e) => {
             label="Price"
             variant="filled"
             placeholder = "$"
-            value={item.price}
+            value={price}
             onChange={(e) => setPrice(e.currentTarget.value)}
           />
           <TextField
@@ -184,7 +186,7 @@ const submitForm = (e) => {
             id="stock"
             label="Stock"
             type="number"
-            value={item.stock}
+            value={stock}
             onChange={(e) => setStock(e.currentTarget.value)}
             InputLabelProps={{
               shrink: true,

@@ -36,7 +36,7 @@ export default function Products(props) {
   let priceMin = price.split(" ")[0];
   let priceMax = price.split(" ")[1];
 
-  // Filters
+  // Filters - To be refactored
   if (category !== "" && price == "" && checked == false) {
     filteredProducts = props.products.filter(
       (product) => product.category == category

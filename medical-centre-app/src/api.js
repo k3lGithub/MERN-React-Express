@@ -114,8 +114,9 @@ export async function deleteProduct(id) {
 }
 
 export const updateProduct = async (id, details) => {
-  const result = await fetch(`/api/v1/movies/${id}`, {
-    method: "PUT",
+  console.log("details",details)
+  const result = await fetch(`/api/product/update/${id}`, {
+    method: "PATCH",
     headers: featchHeaderToken,
     body: JSON.stringify(details),
   });

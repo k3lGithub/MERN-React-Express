@@ -14,6 +14,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+// Refactor later to use by components to share, rather than per page for add, delete, update
+// Refactor later to use React Router to reset states, rather than manual clean up
+
 export default function Delete(props) {
   const [id, setId] = useState("");
   const [msg, setMsg] = useState("");

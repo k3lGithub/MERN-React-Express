@@ -49,6 +49,7 @@ export default function Products(props) {
   console.log("finalArray",categoryList)
 
   // Filters - To be refactored
+  
   if (category !== "" && price == "" && checked == false) {
     filteredProducts = props.products.filter(
       (product) => product.category == category
@@ -157,8 +158,8 @@ export default function Products(props) {
                 >
                   <option aria-label="None" value="" />
                   <optgroup>
-                    {categoryList.map((category) => (
-                      <option>{category}</option>
+                    {categoryList.map((item) => (
+                      <option>{item}</option>
                     ))}
                   </optgroup>
                 </Select>

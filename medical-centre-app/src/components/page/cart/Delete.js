@@ -46,6 +46,7 @@ export default function Delete(props) {
       } catch (e) {
         console.log(e);
         setMsg("Something has went wrong. Check fields and try again.");
+         showItem(false)
       }
   }
 

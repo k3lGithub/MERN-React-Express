@@ -36,6 +36,18 @@ export default function Products(props) {
   let priceMin = price.split(" ")[0];
   let priceMax = price.split(" ")[1];
 
+  const categories = props.products.map((p)=>{
+    return p.category
+  });
+
+  // clean categories
+  var categoryList = categories.filter(function(category, i){
+    return categories.indexOf(category) >= i;
+  });
+
+  console.log("categories",categories)
+  console.log("finalArray",categoryList)
+
   // Filters - To be refactored
   if (category !== "" && price == "" && checked == false) {
     filteredProducts = props.products.filter(
@@ -74,7 +86,7 @@ export default function Products(props) {
     );
   }
 
-  console.log("filteredProducts", filteredProducts);
+  // console.log("filteredProducts", filteredProducts);
 
   const handleChange = (e) => {
     setPrice(e.currentTarget.value);
@@ -145,8 +157,8 @@ export default function Products(props) {
                 >
                   <option aria-label="None" value="" />
                   <optgroup>
-                    {props.products.map((product) => (
-                      <option>{product.category}</option>
+                    {categoryList.map((category) => (
+                      <option>{category}</option>
                     ))}
                   </optgroup>
                 </Select>
